@@ -9,7 +9,7 @@ function App() {
       <Router>
         <Routes>
           <Route exact path="/" element={<Home />} />
-          <Route exact path="/view" element={<ViewProduct />} />
+          <Route exact path="/view/:id" element={<ViewProduct />} />
         </Routes>
       </Router>
     </div>

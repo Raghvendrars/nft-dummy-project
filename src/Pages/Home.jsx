@@ -98,38 +98,42 @@ function createData(name, calories, fat) {
 }
 
 const Home = () => {
-  const rows = [
-    createData("Cupcake", 305, 3.7),
-    createData("Donut", 452, 25.0),
-    createData("Eclair", 262, 16.0),
-    createData("Frozen yoghurt", 159, 6.0),
-    createData("Gingerbread", 356, 16.0),
-    createData("Honeycomb", 408, 3.2),
-    createData("Ice cream sandwich", 237, 9.0),
-    createData("Jelly Bean", 375, 0.0),
-    createData("KitKat", 518, 26.0),
-    createData("Lollipop", 392, 0.2),
-    createData("Marshmallow", 318, 0),
-    createData("Nougat", 360, 19.0),
-    createData("Oreo", 437, 18.0),
-  ].sort((a, b) => (a.calories < b.calories ? -1 : 1));
+
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    axios.get("https://api.rarible.org/v0.1/items/all").then((res) => {
-      setPosts(res.data.items);
-      console.log(posts);
-    });
+    fetDatafromApi()
   }, []);
+
+  const [storeLastId,setStoreLastId]= useState(null);
+  const fetDatafromApi =()=>{
+    if(storeLastId === null){
+      axios.get("https://api.rarible.org/v0.1/items/all").then((res) => {
+        console.log(res.data.items)
+        setPosts(res.data.items);
+        setStoreLastId(res.data.items[res.data.items.length - 1].id)
+
+      });
+    }else{
+      axios.get(`https://api.rarible.org/v0.1/items/all?size=8?continuation=${storeLastId}`).then((res) => {
+        setPosts([...posts, ...res.data.items]);
+        setStoreLastId(res.data.items[res.data.items.length - 1].id)
+      });
+    }
+   
+    setStoreLastId()
+  }
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - posts.length) : 0;
 
   const handleChangePage = (event, newPage) => {
+
     setPage(newPage);
+    fetDatafromApi();
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -177,24 +181,27 @@ const Home = () => {
             <TableBody>
               {(rowsPerPage > 0
                 ? posts.slice(
-                    page * rowsPerPage,
-                    page * rowsPerPage + rowsPerPage
-                  )
+                  page * rowsPerPage,
+                  page * rowsPerPage + rowsPerPage
+                )
                 : posts
               ).map((row, i) => (
-                <Link to="/view+{row.id}">
-                  <TableRow key={row.name}>
-                    <TableCell component="th" scope="row">
-                      {i + 1}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {row.meta.name}
-                    </TableCell>
-                    <TableCell style={{ width: 160 }} align="left">
-                      {row.blockchain}
-                    </TableCell>
-                  </TableRow>
-                </Link>
+
+                <TableRow key={row.name}>
+                  <TableCell component="th" scope="row" width={"20%"} textAlign={"center"}>
+                    {i + 1}
+                  </TableCell>
+                  <TableCell component="th" scope="row" width={"20%"} textAlign={"center"}>
+                    <Link to={`/view/${row.id}`}>{row.meta.name}</Link>
+                  </TableCell>
+                  <TableCell style={{ width: 160 }} align="left" width={"20%"} textAlign={"center"}>
+                    {row.blockchain}
+                  </TableCell>
+                  <TableCell style={{ width: 160 }} align="left" width={"20%"} textAlign={"center"}>
+                    <img src={row.meta.content[0].url || ""} width={100} height={100} />
+                  </TableCell>
+                </TableRow>
+
               ))}
 
               {emptyRows > 0 && (
@@ -208,7 +215,7 @@ const Home = () => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                   colSpan={3}
-                  count={rows.length}
+                  count={posts.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   SelectProps={{
