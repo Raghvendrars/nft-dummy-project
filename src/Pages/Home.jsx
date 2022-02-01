@@ -97,31 +97,37 @@ function createData(name, calories, fat) {
 }
 
 const Home = () => {
-
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    fetDatafromApi()
+    axios
+      .get("https://api.opensea.io/api/v1/collection/doodles-official")
+      .then((res) => {
+        console.log(res.data.collection);
+        setPosts(res.data.items);
+        // setStoreLastId(res.data.items[res.data.items.length - 1].id);
+      });
+    // fetDatafromApi()
   }, []);
 
-  const [storeLastId,setStoreLastId]= useState(null);
-  const fetDatafromApi =()=>{
-    if(storeLastId === null){
-      axios.get("https://api.rarible.org/v0.1/items/all").then((res) => {
-        console.log(res.data.items)
-        setPosts(res.data.items);
-        setStoreLastId(res.data.items[res.data.items.length - 1].id)
+  const [storeLastId, setStoreLastId] = useState(null);
+  // const fetDatafromApi =()=>{
+  //   if(storeLastId === null){
+  //     axios.get("https://api.opensea.io/api/v1/collection/doodles-official").then((res) => {
+  //       console.log(res.data)
+  //       setPosts(res.data.items);
+  //       setStoreLastId(res.data.items[res.data.items.length - 1].id)
 
-      });
-    }else{
-      axios.get(`https://api.rarible.org/v0.1/items/all?size=8?continuation=${storeLastId}`).then((res) => {
-        setPosts([...posts, ...res.data.items]);
-        setStoreLastId(res.data.items[res.data.items.length - 1].id)
-      });
-    }
-   
-    setStoreLastId()
-  }
+  //     });
+  //   }else{
+  //     axios.get(`https://api.rarible.org/v0.1/items/all?size=8?continuation=${storeLastId}`).then((res) => {
+  //       setPosts([...posts, ...res.data.items]);
+  //       setStoreLastId(res.data.items[res.data.items.length - 1].id)
+  //     });
+  //   }
+
+  //   setStoreLastId()
+  // }
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -130,9 +136,8 @@ const Home = () => {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - posts.length) : 0;
 
   const handleChangePage = (event, newPage) => {
-
     setPage(newPage);
-    fetDatafromApi();
+    // fetDatafromApi();
   };
 
   const handleChangeRowsPerPage = (event) => {
@@ -197,7 +202,7 @@ const Home = () => {
                     {row.blockchain}
                   </TableCell>
                   <TableCell style={{ width: 160 }} align="left" width={"20%"} textAlign={"center"}>
-                    <img src={row.meta.content[0].url || ""} width={100} height={100} />
+                    <img src={row.meta.content[0].banner_image_url || ""} width={100} height={100} />
                   </TableCell>
                 </TableRow>
 
@@ -209,6 +214,48 @@ const Home = () => {
                 </TableRow>
               )}
             </TableBody>
+            {/* <TableBody>
+              {posts ? (
+                <TableRow>
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    width={"20%"}
+                    textAlign={"center"}
+                  >
+                    {posts.discord_url}
+                  </TableCell>
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    width={"20%"}
+                    textAlign={"center"}
+                  >
+                    <Link to={`/view/${row.id}`}>{row.meta.name}</Link>
+                  </TableCell>
+                  <TableCell
+                    style={{ width: 160 }}
+                    align="left"
+                    width={"20%"}
+                    textAlign={"center"}
+                  ></TableCell>
+                  <TableCell
+                    style={{ width: 160 }}
+                    align="left"
+                    width={"20%"}
+                    textAlign={"center"}
+                  >
+                    <img
+                      src={row.meta.content[0].banner_image_url || ""}
+                      width={100}
+                      height={100}
+                    />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                <h1>Nothjing to show</h1>
+              )}
+            </TableBody> */}
             <TableFooter>
               <TableRow>
                 <TablePagination
