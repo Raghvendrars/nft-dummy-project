@@ -6,7 +6,7 @@ const Order = () => {
 
   useEffect(() => {
     axios
-      .get("https://ethereum-api.rarible.org/v0.1/nft/items/byCollection?collection=0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d&size=20")
+      .get("https://ethereum-api.rarible.org/v0.1/nft/items/byCollection?collection=0xa6d45c5e16adda2f2c24a94b71dc42c0e225a012&size=5")
       .then((res) => {
         setGetOrder(res.data.items);
       });
@@ -14,6 +14,7 @@ const Order = () => {
 
   console.log(getOrder);
 
+  https://ethereum-api.rarible.org/v0.1/order/orders
   return (
     <div>
       <div className="container">
